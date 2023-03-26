@@ -17,7 +17,6 @@ all_ivy_dtypes = (
     "int16",
     "int32",
     "int64",
-    "int128",
     "uint8",
     "uint16",
     "uint32",
