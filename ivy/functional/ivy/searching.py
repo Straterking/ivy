@@ -19,11 +19,11 @@ from ivy.func_wrapper import (
 # -------------------#
 
 
-@to_native_arrays_and_back
-@handle_out_argument
-@handle_nestable
 @handle_exceptions
+@handle_nestable
 @handle_array_like_without_promotion
+@handle_out_argument
+@to_native_arrays_and_back
 @handle_array_function
 def argmax(
     x: Union[ivy.Array, ivy.NativeArray],
@@ -35,9 +35,10 @@ def argmax(
     select_last_index: bool = False,
     out: Optional[ivy.Array] = None,
 ) -> ivy.Array:
-    """Returns the indices of the maximum values along a specified axis. When the
-    maximum value occurs multiple times, only the indices corresponding to the first
-    occurrence are returned.
+    """
+    Return the indices of the maximum values along a specified axis. When the maximum
+    value occurs multiple times, only the indices corresponding to the first occurrence
+    are returned.
 
     Parameters
     ----------
@@ -111,7 +112,6 @@ def argmax(
     >>> y = ivy.argmax(x, axis=1, keepdims=True, out=z)
     >>> print(z)
     ivy.array([[0],[2],[2]])
-
     """
     return current_backend(x).argmax(
         x,
@@ -123,11 +123,11 @@ def argmax(
     )
 
 
-@to_native_arrays_and_back
-@handle_out_argument
-@handle_nestable
 @handle_exceptions
+@handle_nestable
 @handle_array_like_without_promotion
+@handle_out_argument
+@to_native_arrays_and_back
 @handle_array_function
 def argmin(
     x: Union[ivy.Array, ivy.NativeArray],
@@ -139,9 +139,10 @@ def argmin(
     select_last_index: bool = False,
     out: Optional[ivy.Array] = None,
 ) -> ivy.Array:
-    """Returns the indices of the minimum values along a specified axis. When the
-    minimum value occurs multiple times, only the indices corresponding to the first
-    occurrence are returned.
+    """
+    Return the indices of the minimum values along a specified axis. When the minimum
+    value occurs multiple times, only the indices corresponding to the first occurrence
+    are returned.
 
     Parameters
     ----------
@@ -216,7 +217,6 @@ def argmin(
         a:ivy.array(1),
         b:ivy.array(0)
     }
-
     """
     return current_backend(x).argmin(
         x,
@@ -228,10 +228,10 @@ def argmin(
     )
 
 
-@to_native_arrays_and_back
-@handle_nestable
 @handle_exceptions
+@handle_nestable
 @handle_array_like_without_promotion
+@to_native_arrays_and_back
 @handle_array_function
 def nonzero(
     x: Union[ivy.Array, ivy.NativeArray],
@@ -241,7 +241,8 @@ def nonzero(
     size: Optional[int] = None,
     fill_value: Number = 0,
 ) -> Union[Tuple[ivy.Array], ivy.Array]:
-    """Returns the indices of the array elements which are non-zero.
+    """
+    Return the indices of the array elements which are non-zero.
 
     Parameters
     ----------
@@ -365,11 +366,11 @@ def nonzero(
     )
 
 
-@to_native_arrays_and_back
-@handle_out_argument
-@handle_nestable
 @handle_exceptions
+@handle_nestable
 @handle_array_like_without_promotion
+@handle_out_argument
+@to_native_arrays_and_back
 @handle_array_function
 def where(
     condition: Union[ivy.Array, ivy.NativeArray],
@@ -379,7 +380,8 @@ def where(
     *,
     out: Optional[ivy.Array] = None,
 ) -> ivy.Array:
-    """Returns elements chosen from x or y depending on condition.
+    """
+    Return elements chosen from x or y depending on condition.
 
     Parameters
     ----------
@@ -455,11 +457,11 @@ def where(
 # ------#
 
 
-@to_native_arrays_and_back
-@handle_out_argument
-@handle_nestable
 @handle_exceptions
+@handle_nestable
 @handle_array_like_without_promotion
+@handle_out_argument
+@to_native_arrays_and_back
 @handle_array_function
 def argwhere(
     x: Union[ivy.Array, ivy.NativeArray],
@@ -467,7 +469,8 @@ def argwhere(
     *,
     out: Optional[ivy.Array] = None,
 ) -> ivy.Array:
-    """Returns the indices of all non-zero elements of the input array.
+    """
+    Return the indices of all non-zero elements of the input array.
 
     Parameters
     ----------
@@ -519,6 +522,5 @@ def argwhere(
         a: ivy.array([[0]]),
         b: ivy.array([[0], [1]])
     }
-
     """
     return current_backend(x).argwhere(x, out=out)
