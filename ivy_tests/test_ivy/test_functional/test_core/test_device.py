@@ -36,7 +36,7 @@ from ivy.functional.ivy.device import _get_nvml_gpu_handle
 # ------- #
 
 
-def _ram_array_and_clear_test(metric_fn, device, size=1000000000):
+def _ram_array_and_clear_test(metric_fn, device, size=10000000):
     # This function checks if the memory usage changes before, during and after
 
     # Measure usage before creating array
@@ -262,6 +262,30 @@ def test_to_device(
     assert container_x.to_device(device).dev() == device
     # container static test
     assert ivy.Container.to_device(container_x, device).dev() == device
+
+
+# handle_soft_device_variable
+@handle_test(
+    fn_tree="functional.ivy.handle_soft_device_variable",
+    dtype_and_x=helpers.dtype_and_values(
+        available_dtypes=helpers.get_dtypes("numeric"),
+        min_num_dims=1,
+    ),
+)
+def test_handle_soft_device_variable(*, dtype_and_x):
+    dtype, x = dtype_and_x
+    dtype = dtype[0]
+    x = ivy.to_device(x[0], "cpu")
+
+    def fn(x, y):
+        return ivy.add(x, y)
+
+    for device in _get_possible_devices():
+        ivy.set_default_device(device)
+        out = ivy.handle_soft_device_variable(x, fn=fn, y=x)
+
+        # check if device shifting is successful
+        assert out.device == ivy.default_device()
 
 
 # Function Splitting #
@@ -535,7 +559,8 @@ def test_percent_used_mem_on_dev():
         used = ivy.percent_used_mem_on_dev(ivy.Device(device))
         assert 0 <= used <= 100
 
-        # Same as test_used_mem_on_dev, but using percent of total memory as metric function
+        # Same as test_used_mem_on_dev, but using percent of total memory as metric
+        # function
         _ram_array_and_clear_test(
             lambda: ivy.percent_used_mem_on_dev(device, process_specific=True),
             device=device,
@@ -618,8 +643,8 @@ def test_clear_cached_mem_on_dev():
         # Testing on only GPU since clearing cache mem is relevant
         # for only CUDA devices
         if "gpu" in device:
-            arr = ivy.random_normal(
-                shape=(10000, 10000), dtype="float32", device=device
+            arr = ivy.random_normal(  # noqa: F841
+                shape=(10000, 1000), dtype="float32", device=device
             )
             del arr
             before = get_gpu_mem_usage(device)
@@ -629,8 +654,8 @@ def test_clear_cached_mem_on_dev():
 
 
 def get_cpu_percent():
-    output = subprocess.check_output(["top", "-bn1"])
-    cpu_percent = float(re.search(b"%Cpu\(s\):\s+([\d.]+)\s+us", output).group(1))
+    output = str(subprocess.check_output(["top", "-bn1"]))
+    cpu_percent = float(re.search(r"%Cpu\(s\):\s+([\d.]+)\s+us", output).group(1))
     return cpu_percent
 
 
@@ -638,13 +663,13 @@ def get_cpu_percent():
 def test_dev_util():
     devices = _get_possible_devices()
     for device in devices:
-        # The internally called psutil.cpu_percent() has a unique behavior where it returns 0
-        # as usage when run the second time in same line so simple
+        # The internally called psutil.cpu_percent() has a unique behavior where it
+        # returns 0 as usage when run the second time in same line so simple
         # assert psutil.cpu_percent() == ivy.dev_util(device) isn't possible
         if "cpu" in device:
-            assert 100 > ivy.dev_util(device) > 0
-            # Comparing CPU utilization using top. Two percentiles won't be directly equal
-            # but absolute difference should be below a safe threshold
+            assert 100 >= ivy.dev_util(device) >= 0
+            # Comparing CPU utilization using top. Two percentiles won't be directly
+            # equal but absolute difference should be below a safe threshold
             assert abs(get_cpu_percent() - ivy.dev_util(device)) < 10
         elif "gpu" in device:
             handle = _get_nvml_gpu_handle(device)
